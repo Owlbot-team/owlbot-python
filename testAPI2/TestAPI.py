@@ -8,21 +8,36 @@ url = 'https://prenaud-raspi.dynamic-dns.net/input'
 token = 'Eliot'
 
 
+def verify_dict(data):
+    """Returns True if data is of type dict, otherwise returns False"""
+    if type(data) is dict:
+        print("Error: data was not a dict, was instead {}".format(type(data)))
+        return True
+    else:
+        return False
+
+
 def MoveCameraOwl():
     print("Camera: move to OWL")
     value = 4
     xValue = 147
     zValue = 66
+
     response = requests.get(url, params={
         'value': str(value),
         'xyval': str(xValue),
         'zval': str(zValue),
         'token': token
     })
-    # Get the response data as a python object. Verify that it's a dictionary.
+
+    # Get the response data
     data = response.json()
-    print(type(data))
-    # print the return JSON string
+
+    # Verify that it's a dictionary
+    if not verify_dict(data):
+        return
+
+    # Print the data
     print(data)
     time.sleep(5)
 
@@ -40,10 +55,14 @@ def MoveCameraLight():
         'token': token
     })
 
-    # Get the response data as a python object. Verify that it's a dictionary.
+    # Get the response data
     data = response.json()
-    print(type(data))
-    # print the return JSON string
+
+    # Verify that it's a dictionary
+    if not verify_dict(data):
+        return
+
+    # Print the data
     print(data)
     time.sleep(5)
 
