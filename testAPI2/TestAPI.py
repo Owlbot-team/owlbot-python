@@ -6,9 +6,6 @@ import tkinter as tk
 
 url = 'https://prenaud-raspi.dynamic-dns.net/input'
 token = 'Eliot'
-value = 0
-xValue = 0
-zValue = 0
 
 
 def MoveCameraOwl():
