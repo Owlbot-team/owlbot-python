@@ -1,28 +1,41 @@
 # For tutorial on JSON request see https://realpython.com/python-requests/
 
 import requests
-import time
 import tkinter as tk
+import time
+from threading import Thread
 
 url = 'https://prenaud-raspi.dynamic-dns.net/input'
 token = 'Eliot'
+is_cam_movable = True
 
 
 def verify_dict(data):
     """Returns True if data is of type dict, otherwise returns False"""
     if type(data) is dict:
-        print("Error: data was not a dict, was instead {}".format(type(data)))
         return True
     else:
+        print("Error: data was not a dict, was instead {}".format(type(data)))
         return False
+
+
+def five_sec_timer():
+    time.sleep(5)
+    global is_cam_movable
+    is_cam_movable = True
 
 
 def MoveCameraOwl():
     print("Camera: move to OWL")
+    global is_cam_movable
     value = 4
     xValue = 147
     zValue = 66
 
+    if not is_cam_movable:
+        print("Error: You can\'t do that yet! Please wait.")
+        return
+
     response = requests.get(url, params={
         'value': str(value),
         'xyval': str(xValue),
@@ -39,14 +52,20 @@ def MoveCameraOwl():
 
     # Print the data
     print(data)
-    time.sleep(5)
+    is_cam_movable = False
+    Thread(target=five_sec_timer).start()
 
 
 def MoveCameraLight():
     print("Camera: move to Howard")
+    global is_cam_movable
     value = 4
     xValue = 16
     zValue = 57
+
+    if not is_cam_movable:
+        print("Error: You can\'t do that yet! Please wait.")
+        return
 
     response = requests.get(url, params={
         'value': str(value),
@@ -64,7 +83,8 @@ def MoveCameraLight():
 
     # Print the data
     print(data)
-    time.sleep(5)
+    is_cam_movable = False
+    Thread(target=five_sec_timer).start()
 
 
 root = tk.Tk()
