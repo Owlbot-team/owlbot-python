@@ -72,10 +72,7 @@ root = tk.Tk()
 frame = tk.Frame(root, width=320, height=240)
 frame.pack_propagate(False)
 
-button = tk.Button(frame,
-                   text="Quit",
-                   fg="dark green",
-                   command=quit)
+button = tk.Button(frame, text="Quit", fg="dark green", command=quit)
 button.pack(side=tk.LEFT)
 
 Camera_OWL = tk.Button(frame, text="OWL", command=MoveCameraOwl)
