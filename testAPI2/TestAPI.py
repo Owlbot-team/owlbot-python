@@ -1,11 +1,14 @@
 # For tutorial on JSON request see https://realpython.com/python-requests/
 
 import requests
-import tkinter as tk
+import tkinter as tk 
+from PIL import ImageTk,Image #Pillow
 import time
 from threading import Thread
+import csv
+from datetime import datetime
 
-url = 'https://prenaud-raspi.dynamic-dns.net/input'
+url = 'https://owlbot.loginto.me/input'
 token = 'Eliot'
 is_cam_movable = True
 
@@ -56,22 +59,139 @@ class Camera:
         Thread(target=self.five_sec_timer).start()
 
 
-root = tk.Tk()
-camera = Camera()
+class Statistics:
+    def __init__(self):
+        self.read_stat = True
+ 
+    def verify_dict(self, data):
+        """Returns True if data is of type dict, otherwise returns False"""
+        if type(data) is dict:
+            return True
+        else:
+            print("Error: data was not a dict, was instead "
+                  "{}".format(type(data)))
+            return False
 
-frame = tk.Frame(root, width=320, height=240)
+    def one_sec_timer(self):
+        """Times for 1 second"""
+        time.sleep(1)
+        self.read_stat = True
+
+    def read_statistics(self, value):
+        """Reads temperature and wind speed"""
+        print("Reading statistics")
+
+        if not self.read_stat:
+            print("Error: You can\'t do that yet! Please wait.")
+            return
+
+        with open('stats_file.csv', newline='', mode='w') as stats_file:
+            #fieldnames = ['Time stamp', 'Trunk temp', 'Branch temp', 'Trunk wind', 'Branch wind']
+            fieldnames = ['Time in seconds', 'Trunk temp', 'Branch temp']
+            stats_writer = csv.writer(stats_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            #stats_writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+            stats_writer.writerow(fieldnames)
+          
+            keep_reading = True
+            timestampStr = ""
+            readingCount = 0
+
+            while keep_reading:
+                try:
+                    dateTimeObj = datetime.now()
+                    timestampStrNew = dateTimeObj.strftime("%H:%M:%S")
+
+                    if(timestampStrNew != timestampStr):
+                        response = requests.get(url, params={
+                            'value': str(value),
+                            'token': token
+                        })
+
+                        # Get the response data
+                        data = response.json()
+
+                        # Print the data
+                        # print(data)
+
+                        timestampStr = timestampStrNew
+                        readingCount +=1
+
+                        print(f'{readingCount}: TT: {data[0][6]} BT: {data[1][6]} TW: {data[2][6]} BW: {data[3][6]}')
+                        # for now, just record the temperatures
+                        stats_writer.writerow([readingCount, data[0][6], data[1][6]])
+
+                        # Start the timer
+                        self.read_stat = False
+                        Thread(target=self.one_sec_timer).start()
+
+                except KeyboardInterrupt:
+                    keep_reading = False
+                    print("Stopped reading!")
+
+root = tk.Tk()
+
+root.title("Owlbot Python GUI")     # Add a title
+root.iconbitmap('owlbot.ico')
+
+root.config(bg="red")
+
+camera = Camera()
+statistics = Statistics()
+
+frame = tk.Canvas(root, width=640, height=480)
 frame.pack_propagate(False)
 
-button = tk.Button(frame, text="Quit", fg="dark green", command=quit)
-button.pack(side=tk.LEFT)
+frame.config(bg="gray")
 
-Camera_OWL = tk.Button(frame, text="OWL",
-                       command=lambda: camera.move_camera(4, 147, 66))
-Camera_OWL.pack(side=tk.RIGHT)
+imgOwlbot = Image.open("Owlbot.jpg")
+new_image = imgOwlbot.resize((620, 460))
+imgOwlbot2 = ImageTk.PhotoImage(new_image)
+frame.create_image(10,10, anchor='nw', image=imgOwlbot2)
 
-Camera_LIGHT = tk.Button(frame, text="Howard",
+imgOwl = Image.open("Owlbot.jpg")
+new_image = imgOwl.resize((120, 95))
+imgOwl2 = ImageTk.PhotoImage(new_image)
+Camera_Owl = tk.Button(frame, text="",image= imgOwl2, compound="left",
+                       command=lambda: camera.move_camera(4, 145, 62))
+Camera_Owl.place(x=20,y =200)
+
+
+imgEliot = Image.open("Eliot.png")
+new_image = imgEliot.resize((85, 95))
+imgEliot2 = ImageTk.PhotoImage(new_image)
+Camera_Eliot = tk.Button(frame, text="",image= imgEliot2, compound="left",
+                       command=lambda: camera.move_camera(4, 95, 80))
+Camera_Eliot.place(x=170,y =200)
+
+imgChirpy = Image.open("Chirpy.png")
+new_image = imgChirpy.resize((105, 95))
+imgChirpy2 = ImageTk.PhotoImage(new_image)
+Camera_Chirpy = tk.Button(frame, text="",image= imgChirpy2, compound="left",
+                       command=lambda: camera.move_camera(4, 55, 63))
+Camera_Chirpy.place(x=280,y =200)
+
+imgMat = Image.open("Mat.png")
+new_image = imgMat.resize((80, 95))
+imgMat2 = ImageTk.PhotoImage(new_image)
+Camera_Mat = tk.Button(frame, text="",image= imgMat2, compound="left",
+                       command=lambda: camera.move_camera(4, 34, 56))
+Camera_Mat.place(x=415,y =200)
+
+imgHoward = Image.open("Howard.png")
+new_image = imgHoward.resize((95, 120))
+imgHoward2 = ImageTk.PhotoImage(new_image)
+Camera_HOWARD = tk.Button(frame, text="", image= imgHoward2, compound="left",
                          command=lambda: camera.move_camera(4, 16, 57))
-Camera_LIGHT.pack(side=tk.RIGHT)
+Camera_HOWARD.place(x=520,y =200)
+
+imgStats = Image.open("stats.png")
+new_image = imgStats.resize((95, 95))
+imgStats2 = ImageTk.PhotoImage(new_image)
+Get_STATS = tk.Button(frame, text="", image= imgStats2, compound="left",
+                         command=lambda: statistics.read_statistics(5))
+Get_STATS.place(x=20,y = 320)
+
+
 
 frame.pack()
 root.mainloop()
