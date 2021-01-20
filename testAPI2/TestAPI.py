@@ -12,7 +12,6 @@ from datetime import datetime
 url = 'https://owlbot.loginto.me/input'
 token = ""
 is_cam_movable = True
-stats_run = True
 
 
 class Camera:
@@ -82,15 +81,21 @@ class Statistics:
             return False
 
     def stop(self):
-        print("\nstatistics stopped.")
+        print("\nstatistic stopped.")
+        self.update_label("                                                        ")
+        self.update_label("statistics stopped")
         self.stats_run = False
+
+    @staticmethod
+    def update_label(status_text):
+        Label(frame, text="Status: " + status_text, fg="#C0C0C0", bg='#303030').place(x=130, y=320)
 
     def read_statistics(self, value):
         def read_owlbot():
             """Reads temperature and wind speed"""
-            print("Reading statistics")
+            print("Reading statistics from Owlbot into file owlbot_stats.csv\n")
 
-            with open('stats_file.csv', newline='', mode='w') as stats_file:
+            with open('owlbot_stats.csv', newline='', mode='w') as stats_file:
                 fieldnames = ['Time in seconds', 'Trunk temp', 'Branch temp']
                 stats_writer = csv.writer(stats_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                 stats_writer.writerow(fieldnames)
@@ -100,6 +105,10 @@ class Statistics:
                 reading_count = 0
 
                 while self.stats_run:
+
+                    if not self.stats_run:
+                        break
+
                     date_time_obj = datetime.now()
                     time_stamp_str_new = date_time_obj.strftime("%H:%M:%S")
 
@@ -109,22 +118,17 @@ class Statistics:
                             'token': token
                         })
 
-                        # Get the response data
                         data = response.json()
-
-                        # Print the data
-                        # print(data)
 
                         time_stamp_str = time_stamp_str_new
                         reading_count += 1
+                        printable_text = f'{reading_count}: TT: {data[0][6]} BT: {data[1][6]} TW: {data[2][6]} ' \
+                                         f'BW: {data[3][6]}'
 
-                        print(f'{reading_count}: TT: {data[0][6]} BT: {data[1][6]} TW: {data[2][6]} '
-                              f'BW: {data[3][6]}')
-                        # for now, just record the temperatures
-                        stats_writer.writerow([reading_count, data[0][6], data[1][6]])
-
-                        if not self.stats_run:
-                            break
+                        if self.stats_run:
+                            self.update_label(printable_text)
+                            print(printable_text)
+                            stats_writer.writerow([reading_count, data[0][6], data[1][6]])
 
         Thread(target=read_owlbot).start()
 
@@ -141,7 +145,6 @@ statistics = Statistics()
 frame = tk.Canvas(root, width=640, height=480)
 frame.pack_propagate(False)
 
-#root.wm_attributes('-transparentcolor', '#202020')
 frame.config(bg='#303030')
 
 token_label = Label(frame, text="Token", fg="white", bg='#303030').place(x=20, y=50)
@@ -153,7 +156,7 @@ entry_token = Entry(root).place(x=72, y=51)
 token_button = tk.Button(frame, text="Set", fg='black',  bg="#F0F0F0",
                          command=lambda: camera.set_token(entry_token.get())).place(x=210, y=49)
 stop_stats_button = tk.Button(frame, text="Stop", fg='black',  bg="#F0F0F0",
-                              command=lambda: statistics.stop()).place(x=140, y=380)
+                              command=lambda: statistics.stop()).place(x=130, y=380)
 
 image_background = Image.open("Owlbot.jpg")
 image_button = image_background.resize((120, 95))
