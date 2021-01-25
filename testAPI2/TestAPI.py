@@ -38,7 +38,7 @@ class Camera:
         time.sleep(5)
         self.is_cam_movable = True
 
-    def move_camera(self, value, x_value, z_value):
+    def move_camera(self, value, xy_value, z_value):
         """Moves the camera to location specified in value/xValue/zValue"""
         print("Moving Camera")
 
@@ -48,9 +48,9 @@ class Camera:
 
         response = requests.get(url, params={
             'value': str(value),
-            'xyval': str(x_value),
+            'xyval': str(xy_value),
             'zval': str(z_value),
-            'token': token
+            'token': self.token
         })
 
         # Get the response data
@@ -69,6 +69,11 @@ class Camera:
 class Statistics:
     def __init__(self):
         self.stats_run = True
+        self.token = ""
+
+    def set_token(self, value):
+        self.token = value
+        print(f'token: {value}')
 
     @staticmethod
     def verify_dict(data):
@@ -115,46 +120,50 @@ class Statistics:
                     if time_stamp_str_new != time_stamp_str:
                         response = requests.get(url, params={
                             'value': str(value),
-                            'token': token
+                            'token': self.token
                         })
 
                         data = response.json()
 
                         time_stamp_str = time_stamp_str_new
-                        reading_count += 1
-                        printable_text = f'{reading_count}: TT: {data[0][6]} BT: {data[1][6]} TW: {data[2][6]} ' \
-                                         f'BW: {data[3][6]}'
 
-                        if self.stats_run:
-                            self.update_label(printable_text)
-                            print(printable_text)
-                            stats_writer.writerow([reading_count, data[0][6], data[1][6]])
+                        if len(data) > 3:
+
+                            reading_count += 1
+                            printable_text = \
+                                f'{reading_count}: TT: {data[0][6]} BT: {data[1][6]} TW: {data[2][6]}  BW: {data[3][6]}'
+
+                            if self.stats_run:
+                                self.update_label(printable_text)
+                                print(printable_text)
+                                stats_writer.writerow([reading_count, data[0][6], data[1][6]])
+
+                        else:
+                            print("No data. Enter correct token (case-sensitive) and click 'Set'.")
 
         Thread(target=read_owlbot).start()
 
 
-root = tk.Tk()
-
-root.title("Owlbot Python GUI")
-root.iconbitmap('owlbot.ico')
-root.config(bg="red")
-
 camera = Camera()
 statistics = Statistics()
 
+root = tk.Tk()
+root.title("Owlbot Python GUI")
+root.iconbitmap('owlbot.ico')
+
 frame = tk.Canvas(root, width=640, height=480)
 frame.pack_propagate(False)
-
 frame.config(bg='#303030')
 
 token_label = Label(frame, text="Token", fg="white", bg='#303030').place(x=20, y=50)
 camera_position_label = Label(frame, text="Camera position", fg="white", bg='#303030').place(x=20, y=120)
 statistics_label = Label(frame, text="Statistics", fg="white", bg='#303030').place(x=20, y=290)
 
-
-entry_token = Entry(root).place(x=72, y=51)
+entry_token = Entry(root)
+entry_token.place(x=72, y=51)
 token_button = tk.Button(frame, text="Set", fg='black',  bg="#F0F0F0",
-                         command=lambda: camera.set_token(entry_token.get())).place(x=210, y=49)
+                         command=lambda: [camera.set_token(entry_token.get()),
+                                          statistics.set_token(entry_token.get())]).place(x=210, y=49)
 stop_stats_button = tk.Button(frame, text="Stop", fg='black',  bg="#F0F0F0",
                               command=lambda: statistics.stop()).place(x=130, y=380)
 
@@ -199,7 +208,9 @@ stats_image = ImageTk.PhotoImage(image_for_stats)
 get_stats = tk.Button(frame, text="", image=stats_image, compound="left",
                       command=lambda: statistics.read_statistics(5))
 get_stats.place(x=20, y=320)
+
 frame.pack()
+
 root.mainloop()
 
 # if response.status_code == 200:
