@@ -74,6 +74,14 @@ class Controller:
         self.token = value
         print(f'token: {value}')
 
+    def read_eliot(self):
+        response = requests.get(url, params={
+                            'value': str(8),
+                            'token': self.token
+        })
+        data = response.json()
+        print(data)
+
     def position_eliot(self, value):
         response = requests.get(url, params={
                             'value': str(7),
@@ -93,7 +101,7 @@ class Controller:
 
     def eliot_off(self):
         response = requests.get(url, params={
-                            'value': str(11),
+                            'value': str(10),
                             'token': self.token
         })
         data = response.json()
@@ -286,28 +294,42 @@ branch_fan_ccw_button = tk.Button(frame, text="Branch fan CCW", fg='black',  bg=
                                   command=lambda: [controller.set_token(entry_token.get()),
                                                    controller.branch_fan_direction(17)]).place(x=280, y=289)
 
-eliot_label_position = Label(frame, text="Eliot position", fg="white", bg='#303030').place(x=20, y=330)
-entry_eliot = Entry(root)
-entry_eliot.place(x=140, y=330)
-eliot_set_position = tk.Button(frame, text="SET", fg='black',  bg="#F0F0F0",
-                               command=lambda: [controller.set_token(entry_token.get()),
-                                                controller.position_eliot(entry_eliot.get())]).place(x=280, y=330)
-
-trunk_fan_speed_label = Label(frame, text="Trunk fan speed", fg="white", bg='#303030').place(x=20, y=370)
+trunk_fan_speed_label = Label(frame, text="Trunk fan speed", fg="white", bg='#303030').place(x=20, y=330)
 trunk_fan_speed_entry = Entry(root)
-trunk_fan_speed_entry.place(x=140, y=370)
+trunk_fan_speed_entry.place(x=140, y=330)
 trunk_fan_speed_set = tk.Button(frame, text="SET", fg='black',  bg="#F0F0F0",
                                 command=lambda: [controller.set_token(entry_token.get()),
                                                  controller.trunk_wind_speed(trunk_fan_speed_entry.get())]).place(
-                                                 x=280, y=370)
+                                                 x=280, y=330)
 
-branch_fan_speed_label = Label(frame, text="Branch fan speed", fg="white", bg='#303030').place(x=20, y=410)
+branch_fan_speed_label = Label(frame, text="Branch fan speed", fg="white", bg='#303030').place(x=20, y=370)
 branch_fan_speed_entry = Entry(root)
-branch_fan_speed_entry.place(x=140, y=410)
+branch_fan_speed_entry.place(x=140, y=370)
 branch_fan_speed_set = tk.Button(frame, text="SET", fg='black',  bg="#F0F0F0",
                                  command=lambda: [controller.set_token(entry_token.get()),
                                                   controller.branch_wind_speed(branch_fan_speed_entry.get())]).place(
-                                                 x=280, y=410)
+                                                 x=280, y=370)
+
+eliot_label_position = Label(frame, text="SET Eliot position", fg="white", bg='#303030').place(x=20, y=410)
+entry_eliot = Entry(root)
+entry_eliot.place(x=140, y=410)
+eliot_set_position = tk.Button(frame, text="SET", fg='black',  bg="#F0F0F0",
+                               command=lambda: [controller.set_token(entry_token.get()),
+                                                controller.position_eliot(entry_eliot.get())]).place(x=280, y=410)
+eliot_on_position = tk.Button(frame, text="ON", fg='black',  bg="#F0F0F0",
+                              command=lambda: [controller.set_token(entry_token.get()),
+                                                controller.eliot_on()]).place(x=320, y=410)
+eliot_off_position = tk.Button(frame, text="OFF", fg='black',  bg="#F0F0F0",
+                               command=lambda: [controller.set_token(entry_token.get()),
+                                                controller.eliot_off()]).place(x=360, y=410)
+
+eliot_label_position = Label(frame, text="READ Eliot position", fg="white", bg='#303030').place(x=20, y=450)
+entry_eliot_sensor = Entry(root)
+entry_eliot_sensor.place(x=140, y=450)
+eliot_set_position = tk.Button(frame, text="READ", fg='black',  bg="#F0F0F0",
+                               command=lambda: [controller.set_token(entry_token.get()),
+                                                controller.read_eliot()]).place(x=280, y=450)
+
 
 image_stats = Image.open("stats.png")
 image_for_stats = image_stats.resize((95, 95))
@@ -317,10 +339,7 @@ get_stats = tk.Button(frame, text="", image=stats_image, compound="left",
 get_stats.place(x=20, y=520)
 stop_stats_button = tk.Button(frame, text="Stop", fg='black',  bg="#F0F0F0",
                               command=lambda: statistics.stop()).place(x=130, y=580)
-
-
 frame.pack()
-
 root.mainloop()
 
 # if response.status_code == 200:
