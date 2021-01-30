@@ -81,6 +81,10 @@ class Controller:
         })
         data = response.json()
         print(data)
+        if len(data) < 2:
+            return data
+        else:
+            return 0
 
     def position_eliot(self, value):
         response = requests.get(url, params={
@@ -324,12 +328,14 @@ eliot_off_position = tk.Button(frame, text="OFF", fg='black',  bg="#F0F0F0",
                                                 controller.eliot_off()]).place(x=360, y=410)
 
 eliot_label_position = Label(frame, text="READ Eliot position", fg="white", bg='#303030').place(x=20, y=450)
-entry_eliot_sensor = Entry(root)
-entry_eliot_sensor.place(x=140, y=450)
+string_value = tk.StringVar()
+string_value.set("value")
 eliot_set_position = tk.Button(frame, text="READ", fg='black',  bg="#F0F0F0",
                                command=lambda: [controller.set_token(entry_token.get()),
-                                                controller.read_eliot()]).place(x=280, y=450)
-
+                                                string_value.set(controller.read_eliot())]).place(x=280, y=450)
+eliot_label_reading = Label(frame, textvariable=string_value, fg="white", bg='#404040').place(x=140, y=450)
+eliot_label_post = Label(frame, text="click READ 2 times to get position data", fg="gray", bg='#303030').place(x=350,
+                                                                                                                y=455)
 
 image_stats = Image.open("stats.png")
 image_for_stats = image_stats.resize((95, 95))
