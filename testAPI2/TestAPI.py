@@ -173,7 +173,7 @@ class Statistics:
 
     @staticmethod
     def update_label(status_text):
-        Label(frame, text="Status: " + status_text, fg="#C0C0C0", bg='#303030').place(x=130, y=320)
+        Label(frame, text="Status: " + status_text, fg="#C0C0C0", bg='#303030').place(x=130, y=520)
 
     def read_statistics(self, value):
         def read_owlbot():
@@ -322,20 +322,20 @@ eliot_set_position = tk.Button(frame, text="SET", fg='black',  bg="#F0F0F0",
                                                 controller.position_eliot(entry_eliot.get())]).place(x=280, y=410)
 eliot_on_position = tk.Button(frame, text="ON", fg='black',  bg="#F0F0F0",
                               command=lambda: [controller.set_token(entry_token.get()),
-                                                controller.eliot_on()]).place(x=320, y=410)
+                                               controller.eliot_on()]).place(x=320, y=410)
 eliot_off_position = tk.Button(frame, text="OFF", fg='black',  bg="#F0F0F0",
                                command=lambda: [controller.set_token(entry_token.get()),
                                                 controller.eliot_off()]).place(x=360, y=410)
 
-eliot_label_position = Label(frame, text="READ Eliot position", fg="white", bg='#303030').place(x=20, y=450)
+eliot_read_label = Label(frame, text="READ Eliot position", fg="white", bg='#303030').place(x=20, y=450)
 string_value = tk.StringVar()
 string_value.set("value")
-eliot_set_position = tk.Button(frame, text="READ", fg='black',  bg="#F0F0F0",
-                               command=lambda: [controller.set_token(entry_token.get()),
-                                                string_value.set(controller.read_eliot())]).place(x=280, y=450)
+eliot_read_position = tk.Button(frame, text="READ", fg='black',  bg="#F0F0F0",
+                                command=lambda: [controller.set_token(entry_token.get()),
+                                                 string_value.set(controller.read_eliot())]).place(x=280, y=450)
 eliot_label_reading = Label(frame, textvariable=string_value, fg="white", bg='#404040').place(x=140, y=450)
 eliot_label_post = Label(frame, text="click READ 2 times to get position data", fg="gray", bg='#303030').place(x=350,
-                                                                                                                y=455)
+                                                                                                               y=455)
 
 image_stats = Image.open("stats.png")
 image_for_stats = image_stats.resize((95, 95))
