@@ -1,5 +1,3 @@
-# For tutorial on JSON request see https://realpython.com/python-requests/
-
 import requests
 import tkinter as tk
 from tkinter import *
@@ -211,12 +209,12 @@ class Statistics:
 
                             reading_count += 1
                             printable_text = \
-                                f'{reading_count}: TT: {data[0][6]} BT: {data[1][6]} TW: {data[2][6]}  BW: {data[3][6]}'
+                                f'{reading_count}: TT: {data[1][6]} BT: {data[0][6]} TW: {data[2][6]}  BW: {data[3][6]}'
 
                             if self.stats_run:
                                 self.update_label(printable_text)
                                 print(printable_text)
-                                stats_writer.writerow([reading_count, data[0][6], data[1][6]])
+                                stats_writer.writerow([reading_count, data[1][6], data[0][6]])
 
                         else:
                             print("No data. Enter correct token (case-sensitive) and click 'Set'.")
@@ -275,7 +273,7 @@ camera_mat = tk.Button(frame, text="", image=mat_image, compound="left",
 camera_mat.place(x=415, y=110)
 
 image_howard = Image.open("Howard.png")
-image_for_howard = image_howard.resize((95, 95))
+image_for_howard = image_howard.resize((80, 95))
 howard_image = ImageTk.PhotoImage(image_for_howard)
 camera_howard = tk.Button(frame, text="", image=howard_image, compound="left",
                           command=lambda: camera.move_camera(4, 16, 57))
@@ -314,7 +312,7 @@ branch_fan_speed_set = tk.Button(frame, text="SET", fg='black',  bg="#F0F0F0",
                                                   controller.branch_wind_speed(branch_fan_speed_entry.get())]).place(
                                                  x=280, y=370)
 
-eliot_label_position = Label(frame, text="SET Eliot position", fg="white", bg='#303030').place(x=20, y=410)
+eliot_label_position = Label(frame, text="SET Elito position", fg="white", bg='#303030').place(x=20, y=410)
 entry_eliot = Entry(root)
 entry_eliot.place(x=140, y=410)
 eliot_set_position = tk.Button(frame, text="SET", fg='black',  bg="#F0F0F0",
@@ -327,7 +325,7 @@ eliot_off_position = tk.Button(frame, text="OFF", fg='black',  bg="#F0F0F0",
                                command=lambda: [controller.set_token(entry_token.get()),
                                                 controller.eliot_off()]).place(x=360, y=410)
 
-eliot_read_label = Label(frame, text="READ Eliot position", fg="white", bg='#303030').place(x=20, y=450)
+eliot_read_label = Label(frame, text="READ Elito position", fg="white", bg='#303030').place(x=20, y=450)
 string_value = tk.StringVar()
 string_value.set("value")
 eliot_read_position = tk.Button(frame, text="READ", fg='black',  bg="#F0F0F0",
